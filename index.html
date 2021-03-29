@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <title>Gangbuster</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=width-height, height=device-height, initial-scale=1.0, user-scalable=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="shortcut icon" href="">
+        <script src="https://kit.fontawesome.com/ae7c3de316.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+        <link rel="stylesheet" type="text/css" href="static/css/fonts.css">
+        <link rel="stylesheet" type="text/css" href="static/css/style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Gayathri:wght@100;400;700&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Gayathri:wght@100;400;700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet"> 
+        <script src="static/js/colorful-background-css-generator.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" 
+        integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+        crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="http://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+        <script type="text/javascript">
+
+            //Creating dynamic link that automatically click
+            function downloadURI(uri, name) {
+                var link = document.createElement("a");
+                link.download = name;
+                link.href = uri;
+                link.click();
+                //after creating link you should delete dynamic link
+                //clearDynamicLink(link); 
+            }
+
+            function save() {
+                var thumbnail = document.getElementById('thumbnail');
+                console.log(thumbnail);
+                html2canvas($('#thumbnail')[0], {scale:5}).then(function (canvas) {
+                    var img = canvas.toDataURL("image/png", 1);
+                    window.open(img);
+                    //downloadURI("data:" + img, "yourImage.jpg");
+
+                });
+            }
+
+            function randomNumberHex() {
+                return Math.floor(Math.random() * 255).toString(16);
+            }
+
+            function randomize() {
+                /*
+                var from = "#"+randomNumberHex()+randomNumberHex()+randomNumberHex();
+                var to = "#"+randomNumberHex()+randomNumberHex()+randomNumberHex();
+                console.log(from, to);
+                $('#thumbnail').css('background', '-webkit-gradient(linear,left top,left bottom,from('+from+'),to('+to+'))');
+                */
+               // The Generator
+               var generator = new ColorfulBackgroundGenerator();
+                // The parameters are: degree[0-360],
+                //                     h[0-360], 
+                //                     s[0-1], 
+                //                     l[0-1],
+                //                     posColor[0-100], 
+                //                     posTransparency[0-100]
+                // The lowest layer (at the bottom) in the css is the first added layer.
+                var posColorArr = [100, 30, 10, 0, 0];
+                var posTransparencyArr = [0, 80, 80, 70, 55];
+                for (var i=0; i<5; i++) {
+                    generator.addLayer(new ColorfulBackgroundLayer({
+                        degree: Math.floor(Math.random() * 360), 
+                        h: Math.floor(Math.random() * 360), 
+                        s: Math.random() * (1 - 0.6) + 0.6,
+                        l: Math.random() * (1 - 0.5) + 0.5, 
+                        posColor: posColorArr[i],
+                        posTransparency: posTransparencyArr[i],
+                    })
+                    ); // bottom layer
+                }
+                // Assign generated style to the element identified by it's id
+                generator.assignStyleToElementId("thumbnail");
+            }
+            
+            function remove() {
+                const fileInput = document.getElementById('file');
+                for (const file of fileInput.files) {
+                    console.log(file.name);
+                    console.log(file.mozFullPath);
+                    $('#thumbnail-layer').css('background-image', 'url()');
+                    $('#thumbnail').css('background-image', 'url()');
+                    $('#thumbnail').css('background-color', 'white');
+                }
+            }
+
+            function onFileSelected(event) {
+                var selectedFile = event.target.files[0];
+                var reader = new FileReader();
+                // var imgtag = document.getElementById("myimage");
+                // imgtag.title = selectedFile.name;
+                reader.onload = function(event) {
+                    // imgtag.src = event.target.result;
+                    $('#thumbnail-layer').css('background-image', 'url(' + event.target.result + ')');
+                };
+
+                reader.readAsDataURL(selectedFile);
+            }
+
+            function matDecode(a) {
+                    var angle = Math.atan2(a[1], a[0]),
+                        denom = Math.pow(a[0], 2) + Math.pow(a[1], 2),
+                        scaleX = Math.sqrt(denom),
+                        scaleY = (a[0] * a[3] - a[2] * a[1]) / scaleX,
+                        skewX = Math.atan2(a[0] * a[2] + a[1] * a[3], denom);
+                    return {
+                        angle: angle / (Math.PI / 180),  // this is rotation angle in degrees
+                        scaleX: scaleX,                  // scaleX factor  
+                        scaleY: scaleY,                  // scaleY factor
+                        skewX: skewX / (Math.PI / 180),  // skewX angle degrees
+                        skewY: 0,                        // skewY angle degrees
+                        translateX: a[4],                // translation point  x
+                        translateY: a[5]                 // translation point  y
+                    };
+                };
+
+            window.onload = () => {
+                
+                // Slider to change top margin of row widget
+                $(document).on('input change', 'input[id^="x-title"]', function() {
+                    var newX = 150 - document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailTitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailTitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+out['scaleX']*Math.cos(0)+","+out['scaleX']*-Math.sin(0)+","+out['scaleY']*Math.sin(0)+","+out['scaleY']*Math.cos(0)+","+newX+","+out['translateY']+")"});
+                    $('#x-title-output').text('x: '+newX);
+                    $('#rot-title-output').text('Angle: '+0);
+                    
+                });
+                $(document).on('input change', 'input[id^="y-title"]', function() {
+                    var newY = 150 - document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailTitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailTitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+out['scaleX']*Math.cos(0)+","+out['scaleX']*-Math.sin(0)+","+out['scaleY']*Math.sin(0)+","+out['scaleY']*Math.cos(0)+","+out['translateX']+","+newY+")"});
+                    $('#y-title-output').text('y: '+newY);
+                    $('#rot-title-output').text('Angle: '+0);
+                });
+                $(document).on('input change', 'input[id^="scale-title"]', function() {
+                    var newSize = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailTitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailTitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+newSize*Math.cos(0)+","+newSize*-Math.sin(0)+","+newSize*Math.sin(0)+","+newSize*Math.cos(0)+","+out['translateX']+","+out['translateY']+")"});
+                    $('#scale-title-output').text('Scale: '+newSize);
+                    $('#rot-title-output').text('Angle: '+0);
+                });
+
+                $(document).on('input change', 'input[id^="rot-title"]', function() {
+                    var newAngle = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailTitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailTitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+out['scaleX']*Math.cos(parseFloat(newAngle))+","+out['scaleX']*-Math.sin(parseFloat(newAngle))+","+out['scaleY']*Math.sin(parseFloat(newAngle))+","+out['scaleY']*Math.cos(parseFloat(newAngle))+","+out['translateX']+","+out['translateY']+")"});
+                    $('#rot-title-output').text('Angle: '+newAngle);
+                });
+
+                $(document).on('input change', 'input[id^="hsl-title"]', function() {
+                    var newHue = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailTitle');
+                    var value = 80;
+                    if (newHue == 0) value = 0;
+                    if (newHue == 360) value = 100;
+                    textWidget.css({"color": "hsl("+newHue+",100%,"+value+"%)" });
+                    $('#hsl-title-output').text('Color: '+newHue);
+                });
+
+                $(document).on('input change', 'input[id^="shadow-title"]', function() {
+                    var newShadow = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailTitle');
+                    
+                    var hue = parseInt($('#hsl-title-output').html().match(/-?\d+\.?\d*$/));
+                    var shadow = '';
+                    for (var layer=1; layer <= newShadow; layer++) {
+                        shadow = shadow + ' 0 ' + layer + "px hsl("+hue+",100%,"+(60 - layer*5)+"%)";
+                        if (layer != newShadow) shadow += ',';
+                    }
+                    console.log(shadow);
+                    textWidget.css({"text-shadow": shadow });
+                    $('#shadow-title-output').text('Shadow: '+newShadow);
+                });
+
+                // Slider to change right margin of row widget
+                $(document).on('input', 'textarea[id^="title"]', function() {
+                    var newTitle = document.getElementById(this.id).value
+                    if (newTitle == '') {
+                        $("#thumbnailTitle").text('');
+                    }
+                    else {
+                        $("#thumbnailTitle").html(newTitle.replace(/\r?\n/g, '<br>'));
+                    }
+                });
+
+                $(document).on('input change', 'input[id^="subtitle"]', function() {
+                    var newSubtitle = document.getElementById(this.id).value
+                    if (newSubtitle == '') {
+                        $("#thumbnailSubtitle").text('');
+                    }
+                    else {
+                        $("#thumbnailSubtitle").text(newSubtitle);
+                    }
+                });
+
+                $(document).on('input change', 'input[id^="x-subtitle"]', function() {
+                    var newX = 150 - document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailSubtitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailSubtitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+out['scaleX']*Math.cos(0)+","+out['scaleX']*-Math.sin(0)+","+out['scaleY']*Math.sin(0)+","+out['scaleY']*Math.cos(0)+","+newX+","+out['translateY']+")"});
+                    $('#x-subtitle-output').text('x: '+newX);
+                    $('#rot-subtitle-output').text('Angle: '+0);
+                    
+                });
+                $(document).on('input change', 'input[id^="y-subtitle"]', function() {
+                    var newY = 150 - document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailSubtitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailSubtitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+out['scaleX']*Math.cos(0)+","+out['scaleX']*-Math.sin(0)+","+out['scaleY']*Math.sin(0)+","+out['scaleY']*Math.cos(0)+","+out['translateX']+","+newY+")"});
+                    $('#y-subtitle-output').text('y: '+newY);
+                    $('#rot-subtitle-output').text('Angle: '+0);
+                });
+                $(document).on('input change', 'input[id^="scale-subtitle"]', function() {
+                    var newSize = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailSubtitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailSubtitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+newSize*Math.cos(0)+","+newSize*-Math.sin(0)+","+newSize*Math.sin(0)+","+newSize*Math.cos(0)+","+out['translateX']+","+out['translateY']+")"});
+                    $('#scale-subtitle-output').text('Scale: '+newSize);
+                    $('#rot-subtitle-output').text('Angle: '+0);
+                });
+
+                $(document).on('input change', 'input[id^="rot-subtitle"]', function() {
+                    var newAngle = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailSubtitle');
+                    var matrix = window.getComputedStyle(document.getElementById('thumbnailSubtitle')).transform;
+                    if (matrix == 'none') matrix = "matrix(1,0,0,1,0,0)";
+                    var matrixArray = matrix.replace("matrix(", "").split(",").map(function(e) { return parseFloat(e) })
+                    var out = matDecode(matrixArray);
+                    textWidget.css({'transform': "matrix("+out['scaleX']*Math.cos(parseFloat(newAngle))+","+out['scaleX']*-Math.sin(parseFloat(newAngle))+","+out['scaleY']*Math.sin(parseFloat(newAngle))+","+out['scaleY']*Math.cos(parseFloat(newAngle))+","+out['translateX']+","+out['translateY']+")"});
+                    $('#rot-subtitle-output').text('Angle: '+newAngle);
+                });
+
+                $(document).on('input change', 'input[id^="hsl-subtitle"]', function() {
+                    var newHue = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailSubtitle');
+                    var value = 80;
+                    if (newHue == 0) value = 0;
+                    if (newHue == 360) value = 100;
+                    textWidget.css({"color": "hsl("+newHue+",100%,"+value+"%)" });
+                    $('#hsl-subtitle-output').text('Color: '+newHue);
+                });
+
+                $(document).on('input change', 'input[id^="shadow-subtitle"]', function() {
+                    var newShadow = document.getElementById(this.id).value;
+                    var textWidget = $('#thumbnailSubtitle');
+                    
+                    var hue = parseInt($('#hsl-subtitle-output').html().match(/-?\d+\.?\d*$/));
+                    var shadow = '';
+                    for (var layer=1; layer <= newShadow; layer++) {
+                        shadow = shadow + ' 0 ' + layer + "px hsl("+hue+",100%,"+(60 - layer*5)+"%)";
+                        if (layer != newShadow) shadow += ',';
+                    }
+                    console.log(shadow);
+                    textWidget.css({"text-shadow": shadow });
+                    $('#shadow-subtitle-output').text('Shadow: '+newShadow);
+                });
+
+                $('#style-title').on('change', function() {
+                    console.log(this.value);
+                    $('#thumbnailTitle').css('font-family', ''+this.value+'' );
+                });
+                $('#style-subtitle').on('change', function() {
+                    console.log(this.value);
+                    $('#thumbnailSubtitle').css('font-family', ''+this.value+'' );
+                });
+
+
+            }
+        </script>
+    </head>
+
+    <body>
+        <main>
+            <section>
+                <div style="box-shadow: 0 0 25px rgba(5,5,38,0.1);">
+                    <div id="thumbnail">
+                        <div id='thumbnail-layer'>
+                            <div id="thumbnailTitle__wrapper">
+                                <h1 id="thumbnailTitle"></h1>
+                            </div>
+                            <div id="thumbnailSubtitle__wrapper">
+                                <h2 id="thumbnailSubtitle"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+            </section>
+            <nav>
+                <div>
+                    <div class="title__nav">
+                        <textarea id="title" name="title" 
+                            placeholder="Title"
+                            rows="2"
+                        ></textarea>
+                        <section>
+                            <div>
+                                <div class="range-slider">
+                                    <input type="range" id="x-title" name="x-title" min="0" max="300" value="150" step="1">
+                                    <label id="x-title-output">x: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="y-title" name="y-title" min="0" max="300" value="150" step="1">
+                                    <label id="y-title-output">y: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="scale-title" name="scale-title" min="1" max="10" value="0" step="0.1">
+                                    <label id="scale-title-output">Scale: 1</label>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="range-slider">
+                                    <input type="range" id="rot-title" name="rot-title" min="0" max="6.283185" value="0" step="0.001">
+                                    <label id="rot-title-output">Angle: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="hsl-title" name="rot-title" min="0" max="360" value="0" step="1">
+                                    <label id="hsl-title-output">Color: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="shadow-title" name="rot-title" min="0" max="10" value="0" step="1">
+                                    <label id="shadow-title-output">Shadow: 0</label>
+                                </div>
+
+                                <select id="style-title">
+                                    <option>Amatic SC</option>
+                                    <option>Caveat</option>
+                                    <option>Jost</option>
+                                    <option>Oswald</option>
+                                    <option>Playfair Display</option>
+                                    <option>Rubik</option>
+                                    <option>Russo One</option>
+                                    <option>Yeseva One</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <input type="text" id="subtitle" name="subtitle" placeholder="Subtitle" class="input"/>
+
+                        <section>
+                            <div>
+                                <div class="range-slider">
+                                    <input type="range" id="x-subtitle" name="x-subtitle" min="0" max="300" value="150" step="1">
+                                    <label id="x-subtitle-output">x: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="y-subtitle" name="y-subtitle" min="0" max="300" value="150" step="1">
+                                    <label id="y-subtitle-output">y: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="scale-subtitle" name="scale-subtitle" min="1" max="10" value="0" step="0.1">
+                                    <label id="scale-subtitle-output">Scale: 1</label>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="range-slider">
+                                    <input type="range" id="rot-subtitle" name="rot-subtitle" min="0" max="6.283185" value="0" step="0.001">
+                                    <label id="rot-subtitle-output">Angle: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="hsl-subtitle" name="rot-subtitle" min="0" max="360" value="0" step="1">
+                                    <label id="hsl-subtitle-output">Color: 0</label>
+                                </div>
+                                <div class="range-slider">
+                                    <input type="range" id="shadow-subtitle" name="rot-subtitle" min="0" max="10" value="0" step="1">
+                                    <label id="shadow-subtitle-output">Shadow: 0</label>
+                                </div>
+
+                                <select id="style-subtitle">
+                                    <option>Amatic SC</option>
+                                    <option>Caveat</option>
+                                    <option>Jost</option>
+                                    <option>Oswald</option>
+                                    <option>Playfair Display</option>
+                                    <option>Rubik</option>
+                                    <option>Russo One</option>
+                                    <option>Yeseva One</option>
+                                </select>
+                            </div>
+                        </section>
+
+                    </div>
+                    <div class="buttons__nav">
+                        <input id="file" type="file" onchange="onFileSelected(event)"/>
+                        <input id="output" type="button" value="Remove image" onclick="remove()"/>
+                        <input id="output" type="button" value="Random color" onclick="randomize()"/>
+                        <input id="btn_png" type="button" value="Save PNG" onclick="save()"/>
+                    </div>
+                </div>
+            </nav>
+        </main>
+        {# {% block content %}{% endblock %} #}
+    </body>
+</html>

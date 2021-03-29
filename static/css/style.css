@@ -1,0 +1,204 @@
+:root {
+    --margin: 15px;
+}
+
+html, body, h1, h2 {
+    margin: 0;
+    padding: 0;
+    font-family: 'Gayathri', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    /*border: 1px solid #E8E8EF;*/
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    background: #e9d2b0 url(/img/wood.png) repeat;
+    background: #e9d2b0 url(../img/wood.png) repeat;
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+nav {
+    width: 600px;
+    height: max-content;
+    display: grid;
+    grid-template-columns: var(--margin) [ini] 1fr [end] var(--margin);
+    grid-template-rows: var(--margin) [ini] 1fr [end] var(--margin);
+    background-color: papayawhip;
+
+    border-radius: 5px;
+}
+
+nav > div {
+    grid-column-start: ini;
+    grid-column-end: end;
+    grid-row-start: ini;
+    grid-row-end: end;
+    display: grid;
+    grid-template-columns: [ini] 1fr [mid] 150px [end];
+    grid-template-rows: 1fr;
+    overflow: hidden;
+}
+
+.title__nav {
+    grid-column-start: ini;
+    grid-column-end: mid;
+}
+
+.buttons__nav {
+    grid-column-start: mid;
+    grid-column-end: end;
+    display: flex;
+    flex-direction: column;
+}
+
+.title__nav h1 {
+    margin: 0;
+    width: max-content;
+}
+
+input[type=button] {
+    border: none;
+    outline: none;
+    font-weight: 500;
+    font-size: 14px;
+    color: #FFF;
+    background-color: #217CE8;
+    border-radius: 5px;
+    width: 143px;
+    height: 38px;
+    margin: 2.5px;
+    display: inline-block;
+    text-align: center;
+    line-height: 38px;
+    transition: all .2s cubic-bezier(.05,.03,.35,1);
+}
+
+input[type=button]:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+#thumbnail {
+    width: 384px;
+    height: 216px;
+    background-color: white;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+#thumbnailTitle__wrapper {
+    text-align: center;
+    font-size: 20px;
+}
+
+#thumbnailSubtitle__wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 12px;
+}
+
+.input {
+    border: 1px solid #d7d7d7;
+    width: 92%;
+    height: 40px;
+    font-family: 'Pacifico', sans-serif;
+    font-size: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 2px 0;
+    text-align: left;
+
+    border-radius: 2.5px;
+}
+
+textarea {
+    width: 92%;
+    height: 20px;
+    resize: none;
+    background-color: white;
+    font-size: 12px;
+    font-family: 'Roboto', sans-serif;
+
+    font-size: 20px;
+    padding: 10px;
+    border-style: none;
+    border-width: 0;
+    border: 1px solid #d7d7d7;
+    border-radius: 2.5px;
+}
+
+#thumbnail-layer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.range-slider {
+    width: 100%; /* Width of the outside container */
+  }
+  
+  /* The slider itself */
+ input[type=range] {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 50%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+  }
+  
+  /* Mouse-over effects */
+  input[type=range]:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+  }
+  
+  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #217CE8; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+  
+  input[type=range]::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #217CE8; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+
+.title__nav > section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+.title__nav > section > div {
+    width: 100%;
+}
+
+.range-slider label {
+    font-size: small;
+    vertical-align: center;
+    margin-bottom: 4px;
+}
